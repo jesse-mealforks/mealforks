@@ -3,37 +3,50 @@
 <body>
 
 <h1>Recipe Viewer</h1>
+<input type="text" id="searchBar" placeholder="Search for recipes...">
+
 <div id="recipeContainer"></div>
 
 <script>
-fetch('recipes.json')
-  .then(response => response.json())
-  .then(data => {
+function renderRecipes(recipes) {
     const container = document.getElementById('recipeContainer');
-    for (const recipe of data) {
-      const title = document.createElement('h2');
-      title.textContent = recipe.title;
+    container.innerHTML = ''; // Clear the container
+    for (const recipe of recipes) {
+        const title = document.createElement('h2');
+        title.textContent = recipe.title;
 
-      const image = document.createElement('img');
-      image.src = recipe.image_url;
+        const image = document.createElement('img');
+        image.src = recipe.image_url;
 
-      const ingredients = document.createElement('ul');
-      for (const ingredient of recipe.ingredients) {
-        const li = document.createElement('li');
-        li.textContent = `${ingredient.quantity} ${ingredient.unit} ${ingredient.name}`;
-        ingredients.append(li);
-      }
+        const ingredients = document.createElement('ul');
+        for (const ingredient of recipe.ingredients) {
+            const li = document.createElement('li');
+            li.textContent = `${ingredient.quantity} ${ingredient.unit} ${ingredient.name}`;
+            ingredients.append(li);
+        }
 
-      const directions = document.createElement('ol');
-      for (const direction of recipe.directions) {
-        const li = document.createElement('li');
-        li.textContent = direction;
-        directions.append(li);
-      }
+        const directions = document.createElement('ol');
+        for (const direction of recipe.directions) {
+            const li = document.createElement('li');
+            li.textContent = direction;
+            directions.append(li);
+        }
 
-      container.append(title, image, ingredients, directions);
+        container.append(title, image, ingredients, directions);
     }
-  });
+}
+
+fetch('recipes.json')
+    .then(response => response.json())
+    .then(data => {
+        const searchBar = document.getElementById('searchBar');
+        searchBar.addEventListener('input', () => {
+            const searchString = searchBar.value.toLowerCase();
+            const filteredData = data.filter(recipe => recipe.title.toLowerCase().includes(searchString));
+            renderRecipes(filteredData);
+        });
+        renderRecipes(data);  // Render all recipes initially
+    });
 </script>
 
 </body>
